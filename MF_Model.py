@@ -58,6 +58,12 @@ class MF_Model:
             self._time_step()
             self.time += 1
 
+    def _render_iter(self, steps):
+        for step in range(steps):
+            self._time_step()
+            self.time += 1
+            yield self.time
+
     def set_initial_px_s(self, values):
         self.Px_s = np.ones(self.size) * values
 
@@ -67,16 +73,17 @@ class MF_Model:
     def set_initial_pz_s(self, values):
         self.Pz_s = np.ones(self.size) * values
 
-    def go_to_steady_state(self, check_period=10, threshold=1e-3, sample_fraction=1):
+    def go_to_steady_state(self, check_period=1, threshold=1e-3, sample_fraction=1):
         random_indexes = np.random.randint(0, self.size, int(sample_fraction * self.size))
         is_stable = False
+        yield self.time
 
         while not is_stable:
             px_s_pre = self.Px_s[random_indexes]
             py_s_pre = self.Py_s[random_indexes]
             pz_s_pre = self.Pz_s[random_indexes]
 
-            self.render(check_period)
+            yield from self._render_iter(check_period)
 
             px_s_new = self.Px_s[random_indexes]
             py_s_new = self.Py_s[random_indexes]
