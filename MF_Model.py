@@ -12,7 +12,8 @@ class MF_Model:
         self.graph = graph
         self.degrees = np.array(nx.degree(graph))[:, 1]
         self.adj_matrix = np.array(nx.convert_matrix.to_numpy_matrix(self.graph))
-        self.activity_matrix = self.adj_matrix if mode == MF_Model.MODE_RP else self.adj_matrix / self.degrees
+        self.mode = mode
+        self.activity_matrix = self.adj_matrix if self.mode == MF_Model.MODE_RP else self.adj_matrix / self.degrees[:, np.newaxis]
         self.size = nx.number_of_nodes(self.graph)
         self.params = {
             'delta_1': delta_1,
@@ -30,13 +31,19 @@ class MF_Model:
 
     def a(self):
         return np.prod(1 - (self.params['lambda'] * (1 - self.params['delta_1'] - self.params['delta_2'])) *
-                       (self.activity_matrix * self.Py_s), axis=0)
+                       (self.activity_matrix * self.Py_s), axis=1)
 
     def b(self):
-        return np.prod(1 - self.params['alpha'] * self.activity_matrix * (self.Py_s + self.Pz_s), axis=0)
+        if self.mode == MF_Model.MODE_RP:
+            return np.prod(1 - self.params['alpha'] * self.activity_matrix * (self.Py_s + self.Pz_s), axis=1)
+        else:
+            return 1 - np.sum(self.params['alpha'] * self.activity_matrix * (self.Py_s + self.Pz_s), axis=1)
 
     def c(self):
-        return np.prod(1 - self.params['beta'] * self.activity_matrix * self.Px_s, axis=0)
+        if self.mode == MF_Model.MODE_RP:
+            return np.prod(1 - self.params['beta'] * self.activity_matrix * self.Px_s, axis=1)
+        else:
+            return 1 - np.sum(self.params['beta'] * self.activity_matrix * self.Px_s, axis=1)
 
     def next_px_s(self):
         return self.Px_s * self.a() + self.params['delta_1'] * self.Py_s + self.params['gamma'] * self.Pz_s
