@@ -123,14 +123,14 @@ class MarkovModel:
     @staticmethod
     def _is_stable(px_avg_s, py_avg_s, pz_avg_s, threshold):
         if len(px_avg_s) > 3:
-            px_std = np.std(px_avg_s[int(0.3 * len(px_avg_s)):])
-            py_std = np.std(px_avg_s[int(0.3 * len(py_avg_s)):])
-            pz_std = np.std(px_avg_s[int(0.3 * len(pz_avg_s)):])
+            px_std = np.std(px_avg_s[int(0.4 * len(px_avg_s)):])
+            py_std = np.std(px_avg_s[int(0.4 * len(py_avg_s)):])
+            pz_std = np.std(px_avg_s[int(0.4 * len(pz_avg_s)):])
             return np.alltrue(np.logical_and(np.logical_and(px_std < threshold, py_std < threshold), pz_std < threshold))
 
         return False
 
-    def go_to_steady_state(self, check_period=10, threshold=1e-2):
+    def go_to_steady_state(self, check_period=5, threshold=1e-2):
         is_stable = False
         px_avg_s = []
         py_avg_s = []
@@ -152,7 +152,7 @@ class MarkovModel:
             pz_avg_s.append(pz_avg / check_period)
             is_stable = self._is_stable(px_avg_s, py_avg_s, pz_avg_s, threshold)
 
-    def go_to_steady_state_iter(self, check_period=10, threshold=1e-2):
+    def go_to_steady_state_iter(self, check_period=5, threshold=1e-2):
         is_stable = False
         px_avg_s = []
         py_avg_s = []
