@@ -8,7 +8,7 @@ class MF_Model:
 
     def __init__(self, graph, mode, delta_1, delta_2, lambda_, eta, alpha, gamma, beta):
         if graph is str:
-            graph = nx.write_gpickle(graph)
+            graph = nx.read_gpickle(graph)
         self.graph = graph
         self.degrees = np.array(nx.degree(graph))[:, 1]
         self.adj_matrix = np.array(nx.convert_matrix.to_numpy_matrix(self.graph))
