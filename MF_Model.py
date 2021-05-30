@@ -31,34 +31,35 @@ class MF_Model:
 
     def a(self):
         return np.prod(1 - (self.params['lambda'] * (1 - self.params['delta_1'] - self.params['delta_2'])) *
-                       (self.activity_matrix * self.Py_s), axis=1)
+                       (self.activity_matrix * self.Py_s[:, np.newaxis]), axis=0)
 
     def b(self):
         if self.mode == MF_Model.MODE_RP:
             return np.prod(1 - self.params['alpha'] * self.activity_matrix * (self.Py_s + self.Pz_s), axis=1)
         else:
-            return 1 - np.sum(self.params['alpha'] * self.activity_matrix * (self.Py_s + self.Pz_s), axis=1)
+            return 1 - self.params['alpha'] * np.sum(self.activity_matrix * (self.Py_s + self.Pz_s), axis=1)
 
     def c(self):
         if self.mode == MF_Model.MODE_RP:
             return np.prod(1 - self.params['beta'] * self.activity_matrix * self.Px_s, axis=1)
         else:
-            return 1 - np.sum(self.params['beta'] * self.activity_matrix * self.Px_s, axis=1)
+            return 1 - self.params['beta'] * np.sum(self.activity_matrix * self.Px_s, axis=1)
 
-    def next_px_s(self):
-        return self.Px_s * self.a() + self.params['delta_1'] * self.Py_s + self.params['gamma'] * self.Pz_s
+    def next_px_s(self, a, b, c):
+        return self.Px_s * a + self.params['delta_1'] * self.Py_s + self.params['gamma'] * self.Pz_s
 
-    def next_py_s(self):
-        return self.params['eta'] * (1 - self.a()) * self.Px_s + (1 - self.params['delta_1'] - self.params['delta_2'])\
-               * self.b() * self.Py_s + (1 - self.params['gamma']) * (1 - self.c()) * self.Pz_s
+    def next_py_s(self, a, b, c):
+        return self.params['eta'] * (1 - a) * self.Px_s + (1 - self.params['delta_1'] - self.params['delta_2']) * b \
+               * self.Py_s + (1 - self.params['gamma']) * (1 - c) * self.Pz_s
 
-    def next_pz_s(self):
-        return (1 - self.params['eta']) * (1 - self.a()) * self.Px_s + \
-               ((1 - self.params['delta_1'] - self.params['delta_2']) * (1 - self.b()) + self.params['delta_2'])\
-               * self.Py_s + (1 - self.params['gamma']) * self.c() * self.Pz_s
+    def next_pz_s(self, a, b, c):
+        return (1 - self.params['eta']) * (1 - a) * self.Px_s + \
+               ((1 - self.params['delta_1'] - self.params['delta_2']) * (1 - b) + self.params['delta_2']) * self.Py_s \
+               + (1 - self.params['gamma']) * c * self.Pz_s
 
     def _time_step(self):
-        self.Px_s, self.Py_s, self.Pz_s = self.next_px_s(), self.next_py_s(), self.next_pz_s()
+        a, b, c = self.a(), self.b(), self.c()
+        self.Px_s, self.Py_s, self.Pz_s = self.next_px_s(a, b, c), self.next_py_s(a, b, c), self.next_pz_s(a, b, c)
 
     def render(self, steps):
         for step in range(steps):
@@ -70,6 +71,11 @@ class MF_Model:
             self._time_step()
             self.time += 1
             yield self.time
+
+    def set_initial_values(self, p_x, p_y):
+        self.Px_s = np.ones(self.size) * p_x
+        self.Py_s = np.ones(self.size) * p_y
+        self.Pz_s = np.ones(self.size) * (1 - p_x - p_y)
 
     def set_initial_px_s(self, values):
         self.Px_s = np.ones(self.size) * values
