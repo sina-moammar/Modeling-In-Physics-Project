@@ -9,7 +9,7 @@ def lambda_func(min_lambda, max_lambda, number):
 
 
 def load_graph():
-    graph = nx.read_gpickle('2.7_10000_10_new.gpickle')
+    graph = nx.read_gpickle('networks/2.7_10000_10_new.gpickle')
     return graph
 
 

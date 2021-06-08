@@ -9,7 +9,7 @@ def beta_func(min_beta, max_beta, number):
 
 
 def load_graph():
-    graph = nx.read_gpickle('2.7_10000_100_new.gpickle')
+    graph = nx.read_gpickle('networks/2.7_10000_100_new.gpickle')
     return graph
 
 

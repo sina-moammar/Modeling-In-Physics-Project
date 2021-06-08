@@ -6,8 +6,8 @@ import networkx as nx
 
 
 def load_graphs():
-    graph6 = nx.read_gpickle('2.7_10000_100_new.gpickle')
-    graph7 = nx.read_gpickle('2.7_10000_10_new.gpickle')
+    graph6 = nx.read_gpickle('networks/2.7_10000_100_new.gpickle')
+    graph7 = nx.read_gpickle('networks/2.7_10000_10_new.gpickle')
     return graph6, graph7
 
 
