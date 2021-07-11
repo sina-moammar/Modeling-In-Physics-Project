@@ -51,13 +51,13 @@ class MarkovModel:
 
     def B(self, U, U_1, U_2, U_3, U_nb, I_gamma, I_lambda, I_alpha, I_beta, I_eta):
         if self.mode == MarkovModel.MODE_RP:
-            return np.prod(1 - I_alpha[:, np.newaxis] * self.adj_matrix * (self.Y_s + self.Z_s), axis=1)
+            return np.prod(1 - I_alpha * self.adj_matrix * (self.Y_s + self.Z_s), axis=1)
         else:
             return 1 - I_alpha * (self.Y_s[U_nb] + self.Z_s[U_nb])
 
     def C(self, U, U_1, U_2, U_3, U_nb, I_gamma, I_lambda, I_alpha, I_beta, I_eta):
         if self.mode == MarkovModel.MODE_RP:
-            return np.prod(1 - I_beta[:, np.newaxis] * self.adj_matrix * self.X_s, axis=1)
+            return np.prod(1 - I_beta * self.adj_matrix * self.X_s, axis=1)
         else:
             return 1 - I_beta * self.X_s[U_nb]
 
@@ -142,7 +142,7 @@ class MarkovModel:
         while not is_stable:
             px_avg = py_avg = pz_avg = 0
             for step in range(check_period):
-                self.render(check_period)
+                self.render(1)
                 px_avg += np.mean(self.X_s)
                 py_avg += np.mean(self.Y_s)
                 pz_avg += np.mean(self.Z_s)

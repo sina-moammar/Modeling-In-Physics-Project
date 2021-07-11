@@ -93,8 +93,17 @@ class MF_Model:
         pz_diff = np.abs(pz_s_new - pz_s_pre)
         return np.alltrue(np.logical_and(np.logical_and(px_diff < threshold, py_diff < threshold), pz_diff < threshold))
 
+    @staticmethod
+    def _is_mean_stable(px_s_pre, py_s_pre, pz_s_pre, px_s_new, py_s_new, pz_s_new, threshold):
+        px_diff = np.abs(np.mean(px_s_new) - np.mean(px_s_pre))
+        py_diff = np.abs(np.mean(py_s_new) - np.mean(py_s_pre))
+        pz_diff = np.abs(np.mean(pz_s_new) - np.mean(pz_s_pre))
+        return np.alltrue(np.logical_and(np.logical_and(px_diff < threshold, py_diff < threshold), pz_diff < threshold))
+
     def go_to_steady_state(self, check_period=1, threshold=1e-3, sample_fraction=1):
-        random_indexes = np.random.randint(0, self.size, int(sample_fraction * self.size))
+        random_indexes = np.arange(0, self.size)
+        np.random.shuffle(random_indexes)
+        random_indexes = random_indexes[:int(sample_fraction * self.size)]
         is_stable = False
 
         while not is_stable:
@@ -107,7 +116,7 @@ class MF_Model:
             px_s_new = self.Px_s[random_indexes]
             py_s_new = self.Py_s[random_indexes]
             pz_s_new = self.Pz_s[random_indexes]
-            is_stable = self._is_stable(px_s_pre, py_s_pre, pz_s_pre, px_s_new, py_s_new, pz_s_new, threshold)
+            is_stable = self._is_mean_stable(px_s_pre, py_s_pre, pz_s_pre, px_s_new, py_s_new, pz_s_new, threshold)
 
     def go_to_steady_state_iter(self, check_period=1, threshold=1e-3, sample_fraction=1):
         random_indexes = np.random.randint(0, self.size, int(sample_fraction * self.size))

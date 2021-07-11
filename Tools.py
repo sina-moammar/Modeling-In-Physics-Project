@@ -21,7 +21,7 @@ def power_law_configuration_model(N, gamma, k_mean, k_shift=0):
     graph = nx.Graph(graph)
     graph.remove_edges_from(nx.selfloop_edges(graph))
     print(f'k_mean = {np.mean(np.array(nx.degree(graph))[:, 1])}')
-    nx.write_gpickle(graph, f'data/configuration_model_{gamma}_{N}_{k_mean}.gpickle')
+    nx.write_gpickle(graph, f'networks/configuration_model_{gamma}_{N}_{k_mean}.gpickle')
 
 
 def power_law_HP_model(N, gamma, k_mean):
@@ -40,4 +40,4 @@ def power_law_HP_model(N, gamma, k_mean):
 
     graph = nx.convert_matrix.from_numpy_matrix(adj)
     print(f'k_mean = {np.mean(np.array(nx.degree(graph))[:, 1])}')
-    nx.write_gpickle(graph, f'data/HP_model_{gamma}_{N}_{k_mean}.gpickle')
+    nx.write_gpickle(graph, f'networks/HP_model_{gamma}_{N}_{k_mean}.gpickle')
